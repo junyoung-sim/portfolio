@@ -92,11 +92,13 @@ int main(int argc, char *argv[])
 
     DDPG ddpg(actor, critic);
 
+    double eps = EPS_INIT;
     for(unsigned int itr = 0; itr < ITR; itr++) {
         unsigned int update_count = 0;
         double reward_sum = 0.00, q_sum = 0.00;
         for(unsigned int t = 1; t < EXT; t++) {
-            double eps = std::max(EPS_MIN, (EPS_MIN - EPS_INIT) / CAPACITY * memory.size() + EPS_INIT);
+            if((itr+1)*t > 1 && eps > EPS_MIN)
+                eps += (EPS_MIN - EPS_INIT) / CAPACITY;
             std::vector<double> state = sample_state(t);
             std::vector<double> action = ddpg.epsilon_greedy(state, eps);
             std::vector<double> next_state = sample_state(t+1);
