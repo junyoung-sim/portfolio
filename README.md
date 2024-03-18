@@ -37,10 +37,13 @@ All hyperparameters can be found in ./lib/param.hpp.
 ## Results
 
 **Environment**
+
 ![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/path.png)
 
 **Train**
+
 ![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/log.png)
 
 **Test**
+
 ![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/test.png)
