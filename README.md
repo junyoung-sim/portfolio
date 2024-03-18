@@ -47,3 +47,11 @@ All hyperparameters can be found in ./lib/param.hpp.
 **Test**
 
 ![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/test.png)
+
+## References
+
+https://www.columbia.edu/~ks20/FE-Notes/4700-07-Notes-GBM.pdf
+
+https://arxiv.org/abs/1509.02971
+
+https://spinningup.openai.com/en/latest/algorithms/ddpg.html
