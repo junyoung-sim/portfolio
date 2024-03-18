@@ -22,7 +22,7 @@ Given some state $s_t$, the actor network with parameters $\phi$ yields the acti
 
 $$J=Q(s_{t},a_{t})$$
 
-$Q(s_{t},a_{t})$ is the expected reward (i.e., q-value), predicted by the critic network with parameters $\theta$, given the state-action space $s_{t}$ and $a_{t}$. As $J$ is maximized, the critic network's q-value approximation should also converge to the Bellman Equation shown below via gradient descent with respect to $\theta$. Note that $Q'$ is obtained from a delayed copy (i.e., target) of the critic network. Likewise, $\mu'$ is a delayed copy of the actor network. Soft update with $\tau$ must be used to synchronize the real-time and delayed versions by copying a small percentage of the real-time parameters to their targets after every batch update.
+$Q(s_{t},a_{t})$ is the expected reward (i.e., q-value), predicted by the critic network with parameters $\theta$, given the state-action space $s_{t}$ and $a_{t}$. As $J$ is maximized, the critic network's q-value approximation should also converge to the Bellman Equation shown below via gradient descent with respect to $\theta$. Note that $Q'$ is obtained from a delayed copy (i.e., target) of the critic network. Likewise, $\mu'$ is a delayed copy of the actor network. Soft update with $\tau$ must be used to synchronize the real-time and delayed versions by copying a small percentage of the real-time parameters to their targets after every batch update from replay memory.
 
 $$Q^{*}(s_{t},a_{t})=r_{t}+{\gamma}Q'(s_{t+1},a_{t+1}=\mu'(s_{t+1}))$$
 
