@@ -1,4 +1,4 @@
-# Deep Deterministic Policy Gradient for Simulated Portfolio Optimization with Geometric Brownian Motion
+# Deep Deterministic Policy Gradient and Geometric Brownian Motion for Simulated Portfolio Optimization
 
 ## Objective
 
