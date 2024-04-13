@@ -4,12 +4,15 @@
 
 Given N independent particles that follow a random walk (i.e, asset price series), train a DDPG agent that maximizes the logarithmic sum of the position of all N particles (i.e., portfolio value).
 
-***This is an approximately 5-year long culmination of multiple quantitative trading algorithm projects listed below:***
+This is an approximately 5-year long culmination of multiple quantitative trading algorithm projects listed below:
 
-*** https://github.com/junyoung-sim/sltm *** \\
-*** https://github.com/junyoung-sim/quant *** \\
-*** https://github.com/junyoung-sim/gbm-drl-quant *** \\
-*** https://github.com/junyoung-sim/ddpg-quant ***
+1) https://github.com/junyoung-sim/sltm
+
+2) https://github.com/junyoung-sim/quant
+
+3) https://github.com/junyoung-sim/gbm-drl-quant
+
+4) https://github.com/junyoung-sim/ddpg-quant
 
 ## Simulating Environment via Geometric Brownian Motion
 
