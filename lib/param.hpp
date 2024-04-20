@@ -1,9 +1,9 @@
 #ifndef __PARAM_HPP_
 #define __PARAM_HPP_
 
-#define N 100
+#define N 10
 #define INITIAL_VALUE 1.00
-#define MU 0.00
+#define MU 0.0001
 #define SIGMA 0.01
 #define EXT 1000
 
