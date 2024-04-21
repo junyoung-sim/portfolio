@@ -25,7 +25,7 @@ std::vector<double> test;
 std::vector<double> sample_state(unsigned int t) {
     std::vector<double> state(N);
     for(unsigned int i = 0; i < N; i++)
-        state[i] = path[i][t];
+        state[i] = (path[i][t] - path[i][t-1]) / path[i][t-1];
     return state;
 }
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 
             double reward = 0.00;
             for(unsigned int i = 0; i < N; i++)
-                reward += next_state[i] * action[i];
+                reward += path[i][t+1] * action[i];
             reward = log10(reward);
             reward_sum += reward;
             
@@ -134,16 +134,14 @@ int main(int argc, char *argv[])
     for(unsigned int t = 1; t < EXT; t++) {
         std::vector<double> state = sample_state(t);
         std::vector<double> action = ddpg.epsilon_greedy(state, 0.00);
-        std::vector<double> next_state = sample_state(t+1);
 
         double reward = 0.00;
         for(unsigned int i = 0; i < N; i++)
-            reward += next_state[i] * action[i];
+            reward += path[i][t+1] * action[i];
         test.push_back(reward);
 
         std::vector<double>().swap(state);
         std::vector<double>().swap(action);
-        std::vector<double>().swap(next_state);
     }
 
     write();
