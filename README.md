@@ -48,7 +48,7 @@ All hyperparameters can be found in ./lib/param.hpp.
 
 ![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/result.png)
 
-The results above show that the model converges to a momentum-based statistical arbitrage strategy. This is because the model's final portfolio value is essentially the average value of all N assets, which must be achieved by decreasing the weight of assets with overshooting valuations and increasing the weight of assets with low valuations.
+The results above show that each time segment of the model's portfolio value corresponds closely to one of the N assets with the best return during that period and ends with a value close to the average value of all N assets, suggesting that the model acquired a momentum-based statistical arbitrage strategy. 
 
 ## References
 
