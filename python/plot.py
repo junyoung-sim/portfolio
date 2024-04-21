@@ -3,7 +3,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-plt.figure(figsize=(25, 5))
+plt.figure(figsize=(20,5))
 
 path = pd.read_csv("./res/path")
 plt.subplot(1, 3, 1)
