@@ -20,7 +20,6 @@ std::vector<std::vector<double>> path;
 std::vector<Memory> memory;
 
 std::vector<double> mean_reward;
-std::vector<double> mean_q_value;
 std::vector<double> test;
 
 std::vector<double> sample_state(unsigned int t) {
@@ -41,9 +40,9 @@ void write() {
     out.close();
 
     out.open("./res/log");
-    out << "mr,q\n";
+    out << "mr\n";
     for(unsigned int i = 0; i < ITR; i++)
-        out << mean_reward[i] << "," << mean_q_value[i] << "\n";
+        out << mean_reward[i] << "\n";
     out.close();
 
     out.open("./res/test");
@@ -60,7 +59,6 @@ void clean() {
     std::vector<std::vector<double>>().swap(path);
     std::vector<Memory>().swap(memory);
     std::vector<double>().swap(mean_reward);
-    std::vector<double>().swap(mean_q_value);
     std::vector<double>().swap(test);
 }
 
@@ -127,11 +125,10 @@ int main(int argc, char *argv[])
         }
 
         mean_reward.push_back(reward_sum / (EXT-1));
-        mean_q_value.push_back(q_sum / update_count);
 
         std::cout << "ITR=" << itr << " ";
         std::cout << "MR=" << mean_reward.back() << " ";
-        std::cout << "Q=" << mean_q_value.back() << "\n";
+        std::cout << "Q=" << q_sum / update_count << "\n";
     }
 
     for(unsigned int t = 1; t < EXT; t++) {
