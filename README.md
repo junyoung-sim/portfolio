@@ -2,7 +2,7 @@
 
 ## Objective
 
-Given N independent particles that follow a random walk (i.e, asset price series), train a DDPG agent that maximizes the logarithmic sum of the position of all N particles (i.e., portfolio value).
+Given N independently moving price series following geometric Brownian Motion with equivalent parameters, train a DDPG agent that maximizes the logarithmic portfolio value.
 
 This is an approximately 5-year long culmination of multiple quantitative trading algorithm projects listed below:
 
@@ -16,15 +16,15 @@ This is an approximately 5-year long culmination of multiple quantitative tradin
 
 ## Simulating Environment via Geometric Brownian Motion
 
-Suppose a particle's position, $P(t)$, can be modeled as a stochastic process defined by
+Suppose an asset's price, $P(t)$, can be modeled as a stochastic process defined by
 
 $$P(t)=P_{0}e^{X(t)}$$
 
-where $X(t)={\sigma}B(t)+{\mu} t$ is Brownian Motion with drift having a lognormal distribution (i.e., Geometric Brownian Motion). By computing the moment generating function for Brownian Motion with drift, the expected position at any given time is simplified as shown below.
+where $X(t)={\sigma}B(t)+{\mu} t$ is Brownian Motion with drift having a lognormal distribution (i.e., Geometric Brownian Motion). By computing the moment generating function for Brownian Motion with drift, the expected price at any given time is simplified as shown below.
 
 $$E(P(t))=P_{0}e^{(\mu+\frac{\sigma^2}{2})t}$$
 
-Given $P_{0}$, $\mu$, $\sigma$, and K, the path of N independent particles following Geometric Brownian Motion can be simulated over K time steps that follow $P_{0}$.
+Given $P_{0}$, $\mu$, $\sigma$, and K, the path of N independent price series following Geometric Brownian Motion can be simulated over K time steps that follow $P_{0}$.
 
 ## Deep Deterministic Policy Gradient for Portfolio Optimization
 
@@ -38,7 +38,7 @@ $$Q^{*}(s_{t},a_{t})=r_{t}+{\gamma}Q'(s_{t+1},a_{t+1}=\mu'(s_{t+1}))$$
 
 Since the critic network directly maps the state-action space to reward, the action gradient $\frac{dQ}{da}$ must be computed for each action while updating the critic network such that $\nabla{J}=\nabla_{a_{t}}Q(s_{t},a_{t};\theta)\nabla_{\phi}\mu(s_{t})$ can be computed to maximize $J$. Exploration can be done by either adding OU noise or uncorrelated Gaussian noise to the parameters.
 
-Let the state space be $s_{t}=(\Delta p_{1}(t), \Delta p_{2}(t), ..., \Delta p_{n-1}(t), \Delta p_{n}(t))$ where $\Delta P_{i}(t)$ is the percentage change in the position of each independent particle between one time step. Given $s_t$, the actor yields the action space $a_{t}$ where each value in $a_{t}$ is the percentage allocation corresponding to each independent particle's position. The reward is calculated as $r_{t}=\log(p_{t+1}{\cdot}a_{t})$.
+Let the state space be $s_{t}=(\delta P_{1}(t), \delta P_{2}(t), ..., \delta P_{n-1}(t), \delta P_{n}(t))$ where $\delta P_{i}(t)$ is the percentage change of each asset's price series over one time-step. Given $s_t$, the actor yields the action space $a_{t}$ where each value in $a_{t}$ is the weight allocated to each asset. The reward is calculated as $r_{t}=\log(P_{t+1}{\cdot}a_{t})$.
 
 ## Parameters
 
@@ -47,6 +47,8 @@ All hyperparameters can be found in ./lib/param.hpp.
 ## Results
 
 ![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/result.png)
+
+The results above show that the model converges to a momentum-based statistical arbitrage strategy. This is because the model's final portfolio value is essentially the average value of all N assets, which must be achieved by decreasing the weight of assets with overshooting valuations and increasing the weight of assets with low valuations.
 
 ## References
 
