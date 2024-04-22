@@ -48,7 +48,7 @@ All hyperparameters can be found in ./lib/param.hpp.
 
 ![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/result.png)
 
-The results above show that each time segment of the model's portfolio value corresponds closely to one of the N assets with the best return during that period. The model's portfolio value also reaches closely to the average value of all N assets. These observations ultimately suggest that the model acquired a momentum-based statistical arbitrage strategy.
+The results above show that each time segment of the model's portfolio value corresponds closely to one of the N assets with the best return during that period (momentum-based). The model's portfolio value also reaches closely to the average value of all N assets (arbitrage).
 
 ## References
 
