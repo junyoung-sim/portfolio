@@ -52,6 +52,8 @@ All hyperparameters can be found in ./lib/param.hpp.
 
 The results above show that each time segment of the model's portfolio value corresponds closely to one of the N assets with the best return during that period (momentum-based). The model's portfolio value also reaches closely to the average value of all N assets (arbitrage).
 
+Note that the results above are merely theoretical and experimental as the model's convergence and behavior may vary by the random seed assigned for simulating an environment. Further work and more complex optimization objectives would be needed for practical applications in real market environments.
+
 ## References
 
 https://www.columbia.edu/~ks20/FE-Notes/4700-07-Notes-GBM.pdf
