@@ -21,11 +21,14 @@ std::vector<Memory> memory;
 
 std::vector<double> mean_reward;
 std::vector<double> test;
+std::vector<std::vector<double>> test_action;
 
 std::vector<double> sample_state(unsigned int t) {
-    std::vector<double> state(N);
-    for(unsigned int i = 0; i < N; i++)
-        state[i] = (path[i][t] - path[i][t-1]) / path[i][t-1];
+    std::vector<double> state;
+    for(unsigned int i = 0; i < N; i++) {
+        state.push_back(log10(path[i][t]));
+        state.push_back((path[i][t] - path[i][t-1]) / path[i][t-1]);
+    }
     return state;
 }
 
@@ -51,6 +54,15 @@ void write() {
         out << x << "\n";
     out.close();
 
+    out.open("./res/action");
+    for(unsigned int i = 0; i < N; i++)
+        out << i << (i != N-1 ? "," : "\n");
+    for(unsigned int t = 0; t < EXT-1; t++) {
+        for(unsigned int i = 0; i < N; i++)
+            out << test_action[i][t] << (i != N-1 ? "," : "\n");
+    }
+    out.close();
+
     std::system("./python/plot.py");
 }
 
@@ -60,6 +72,7 @@ void clean() {
     std::vector<Memory>().swap(memory);
     std::vector<double>().swap(mean_reward);
     std::vector<double>().swap(test);
+    std::vector<std::vector<double>>().swap(test_action);
 }
 
 int main(int argc, char *argv[])
@@ -74,18 +87,20 @@ int main(int argc, char *argv[])
     path = gbm(param, EXT, seed);
 
     Net actor;
-    actor.add_layer(N+0, N+N);
-    actor.add_layer(N+N, N+N);
-    actor.add_layer(N+N, N+N);
-    actor.add_layer(N+N, N+0);
+    actor.add_layer(N*2, N*2);
+    actor.add_layer(N*2, N*2);
+    actor.add_layer(N*2, N*2);
+    actor.add_layer(N*2, N*2);
+    actor.add_layer(N*2, N);
     actor.use_softmax();
     actor.init(seed);
 
     Net critic;
-    critic.add_layer(N+N, N+0);
-    critic.add_layer(N+0, N+0);
-    critic.add_layer(N+0, N+0);
-    critic.add_layer(N+0, 1);
+    critic.add_layer(N*3, N*3);
+    critic.add_layer(N*3, N*3);
+    critic.add_layer(N*3, N*3);
+    critic.add_layer(N*3, N*3);
+    critic.add_layer(N*3, 1);
     critic.init(seed);
 
     DDPG ddpg(actor, critic);
@@ -131,13 +146,17 @@ int main(int argc, char *argv[])
         std::cout << "Q=" << q_sum / update_count << "\n";
     }
 
+    test_action.resize(N, std::vector<double>(EXT-1));
+
     for(unsigned int t = 1; t < EXT; t++) {
         std::vector<double> state = sample_state(t);
         std::vector<double> action = ddpg.epsilon_greedy(state, 0.00);
 
         double reward = 0.00;
-        for(unsigned int i = 0; i < N; i++)
+        for(unsigned int i = 0; i < N; i++) {
             reward += path[i][t+1] * action[i];
+            test_action[i][t-1] = action[i];
+        }
         test.push_back(reward);
 
         std::vector<double>().swap(state);
