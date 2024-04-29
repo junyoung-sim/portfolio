@@ -38,7 +38,7 @@ $$Q^{*}(s_{t},a_{t})=r_{t}+{\gamma}Q'(s_{t+1},a_{t+1}=\mu'(s_{t+1}))$$
 
 Since the critic network directly maps the state-action space to reward, the action gradient $\frac{dQ}{da}$ must be computed for each action while updating the critic network such that $\nabla{J}=\nabla_{a_{t}}Q(s_{t},a_{t};\theta)\nabla_{\phi}\mu(s_{t})$ can be computed to maximize $J$. Exploration can be done by either adding OU noise or uncorrelated Gaussian noise to the parameters.
 
-Let the state space be $s_{t}=(\delta P_{1}(t), \delta P_{2}(t), ..., \delta P_{n-1}(t), \delta P_{n}(t))$ where $\delta P_{i}(t)$ is the percentage change of each asset's price series over one time-step. Given $s_t$, the actor yields the action space $a_{t}$ where each value in $a_{t}$ is the weight allocated to each asset. The reward is calculated as $r_{t}=\log(P_{t+1}{\cdot}a_{t})$.
+Let the state space be $s_{t}=<(\log(P_{1}(t)), \delta P_{1}(t)), (\log(P_{2}(t)), \delta P_{2}(t)), ..., (\log(P_{n-1}(t)), \delta P_{n-1}(t))>$ where $\log(P_{i}(t))$ is the logarithmic price of each asset and $\delta P_{i}(t)$ is the percentage change of each asset's price series over one time-step. Given $s_t$, the actor yields the action space $a_{t}$ where each value in $a_{t}$ is the weight allocated to each asset. The reward is calculated as $r_{t}=\log(P_{t+1}{\cdot}a_{t})$.
 
 ## Parameters
 

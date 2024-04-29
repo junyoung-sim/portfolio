@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     actor.add_layer(N*2, N*2);
     actor.add_layer(N*2, N*2);
     actor.add_layer(N*2, N*2);
-    actor.add_layer(N*2, N*2);
+    //actor.add_layer(N*2, N*2);
     actor.add_layer(N*2, N);
     actor.use_softmax();
     actor.init(seed);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     critic.add_layer(N*3, N*3);
     critic.add_layer(N*3, N*3);
     critic.add_layer(N*3, N*3);
-    critic.add_layer(N*3, N*3);
+    //critic.add_layer(N*3, N*3);
     critic.add_layer(N*3, 1);
     critic.init(seed);
 
