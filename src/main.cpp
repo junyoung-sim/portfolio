@@ -24,11 +24,9 @@ std::vector<double> test;
 std::vector<std::vector<double>> test_action;
 
 std::vector<double> sample_state(unsigned int t) {
-    std::vector<double> state;
-    for(unsigned int i = 0; i < N; i++) {
-        state.push_back(log10(path[i][t]));
-        state.push_back((path[i][t] - path[i][t-1]) / path[i][t-1]);
-    }
+    std::vector<double> state(N);
+    for(unsigned int i = 0; i < N; i++)
+        state[i] = (path[i][t] - path[i][t-OBS]) / path[i][t-OBS];
     return state;
 }
 
@@ -87,20 +85,18 @@ int main(int argc, char *argv[])
     path = gbm(param, EXT, seed);
 
     Net actor;
-    actor.add_layer(N*2, N*2);
-    actor.add_layer(N*2, N*2);
-    actor.add_layer(N*2, N*2);
-    //actor.add_layer(N*2, N*2);
-    actor.add_layer(N*2, N);
+    actor.add_layer(N+0, N+N);
+    actor.add_layer(N+N, N+N);
+    actor.add_layer(N+N, N+N);
+    actor.add_layer(N+N, N+0);
     actor.use_softmax();
     actor.init(seed);
 
     Net critic;
-    critic.add_layer(N*3, N*3);
-    critic.add_layer(N*3, N*3);
-    critic.add_layer(N*3, N*3);
-    //critic.add_layer(N*3, N*3);
-    critic.add_layer(N*3, 1);
+    critic.add_layer(N+N, N+0);
+    critic.add_layer(N+0, N+0);
+    critic.add_layer(N+0, N+0);
+    critic.add_layer(N+0, 1);
     critic.init(seed);
 
     DDPG ddpg(actor, critic);
@@ -109,8 +105,8 @@ int main(int argc, char *argv[])
     for(unsigned int itr = 0; itr < ITR; itr++) {
         unsigned int update_count = 0;
         double reward_sum = 0.00, q_sum = 0.00;
-        for(unsigned int t = 1; t < EXT; t++) {
-            if((itr+1)*t > 1 && eps > EPS_MIN)
+        for(unsigned int t = OBS; t < EXT; t++) {
+            if((itr+1)*t > OBS && eps > EPS_MIN)
                 eps += (EPS_MIN - EPS_INIT) / CAPACITY;
             std::vector<double> state = sample_state(t);
             std::vector<double> action = ddpg.epsilon_greedy(state, eps);
@@ -148,7 +144,7 @@ int main(int argc, char *argv[])
 
     test_action.resize(N, std::vector<double>(EXT-1));
 
-    for(unsigned int t = 1; t < EXT; t++) {
+    for(unsigned int t = OBS; t < EXT; t++) {
         std::vector<double> state = sample_state(t);
         std::vector<double> action = ddpg.epsilon_greedy(state, 0.00);
 

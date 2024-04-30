@@ -6,6 +6,7 @@
 #define MU 0.00
 #define SIGMA 0.01
 #define EXT 1000
+#define OBS 10
 
 #define ITR 100
 #define EPS_INIT 1.00
