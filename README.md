@@ -4,7 +4,7 @@
 
 Given N independently moving price series following geometric Brownian Motion with equivalent parameters, train a DDPG agent that maximizes the logarithmic portfolio value.
 
-This is an approximately 5-year long culmination of multiple quantitative trading algorithm projects listed below:
+This is a 4-year long culmination of multiple quantitative trading algorithm projects listed below:
 
 1) https://github.com/junyoung-sim/sltm
 
