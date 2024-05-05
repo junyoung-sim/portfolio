@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <vector>
+#include <thread>
 
 #include "../lib/ddpg.hpp"
 
@@ -13,7 +14,7 @@ std::vector<double> DDPG::epsilon_greedy(std::vector<double> &state, double eps)
     return actor->forward(state, explore < eps);
 }
 
-void DDPG::optimize_critic(std::vector<double> &state_action, double q, double optimal, std::vector<double> &agrad, double alpha, double lambda) {
+void DDPG::optimize_critic(std::vector<double> &state_action, double q, double optimal, std::vector<double> &agrad, std::vector<bool> &flag, double alpha, double lambda) {
     for(int l = critic->num_of_layers() - 1; l >= 0; l--) {
         double part = 0.00, grad = 0.00;
         for(unsigned int n = 0; n < critic->layer(l)->out_features(); n++) {
@@ -26,8 +27,10 @@ void DDPG::optimize_critic(std::vector<double> &state_action, double q, double o
             for(unsigned int i = 0; i < critic->layer(l)->in_features(); i++) {
                 if(l == 0) {
                     grad = part * state_action[i];
-                    if(i < agrad.size())
+                    if(i < agrad.size()) {
                         agrad[i] = part * critic->layer(l)->node(n)->weight(i);
+                        flag[i] = true;
+                    }
                 }
                 else {
                     grad = part * critic->layer(l-1)->node(i)->act();
@@ -43,11 +46,14 @@ void DDPG::optimize_critic(std::vector<double> &state_action, double q, double o
     }
 }
 
-void DDPG::optimize_actor(std::vector<double> &state, std::vector<double> &action, std::vector<double> &agrad, double alpha, double lambda) {
+void DDPG::optimize_actor(std::vector<double> &state, std::vector<double> &action, std::vector<double> &agrad, std::vector<bool> &flag, double alpha, double lambda) {
     for(int l = actor->num_of_layers() - 1; l >= 0; l--) {
         double part = 0.00, grad = 0.00;
         for(unsigned int n = 0; n < actor->layer(l)->out_features(); n++) {
-            if(l == actor->num_of_layers() - 1) part = agrad[n] * action[n] * (1.00 - action[n]);
+            if(l == actor->num_of_layers() - 1) {
+                while(!flag[n]) {}
+                part = agrad[n] * action[n] * (1.00 - action[n]);
+            }
             else part = actor->layer(l)->node(n)->err() * drelu(actor->layer(l)->node(n)->sum());
 
             double updated_bias = actor->layer(l)->node(n)->bias() + alpha * part;
@@ -86,9 +92,15 @@ double DDPG::optimize(Memory &memory, double gamma, double alpha, double lambda)
     double optimal = memory.reward() + gamma * future[0];
 
     std::vector<double> agrad(action->size(), 0.00);
-    
-    optimize_critic(state_action, q[0], optimal, agrad, alpha, lambda);
-    optimize_actor(*state, *action, agrad, alpha, lambda);
+    std::vector<bool> flag(action->size(), false);
+
+    std::thread critic_optimizer(&DDPG::optimize_critic, this, std::ref(state_action),
+                                 q[0], optimal, std::ref(agrad), std::ref(flag), alpha, lambda);
+    std::thread actor_optimizer(&DDPG::optimize_actor, this, std::ref(*state),
+                                std::ref(*action), std::ref(agrad), std::ref(flag), alpha, lambda);
+
+    critic_optimizer.join();
+    actor_optimizer.join();
 
     return q[0];
 }

@@ -50,8 +50,8 @@ public:
 
     std::vector<double> epsilon_greedy(std::vector<double> &state, double eps);
 
-    void optimize_critic(std::vector<double> &state_action, double q, double optimal, std::vector<double> &agrad, double alpha, double lambda);
-    void optimize_actor(std::vector<double> &state, std::vector<double> &action, std::vector<double> &agrad, double alpha, double lambda);
+    void optimize_critic(std::vector<double> &state_action, double q, double optimal, std::vector<double> &agrad, std::vector<bool> &flag, double alpha, double lambda);
+    void optimize_actor(std::vector<double> &state, std::vector<double> &action, std::vector<double> &agrad, std::vector<bool> &flag, double alpha, double lambda);
     double optimize(Memory &memory, double gamma, double alpha, double lambda);
 
     void sync(double tau);
