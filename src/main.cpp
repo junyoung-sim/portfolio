@@ -84,19 +84,19 @@ int main(int argc, char *argv[])
 
     path = gbm(param, EXT, seed);
 
-    Net actor;
-    actor.add_layer(N+0, N+N);
-    actor.add_layer(N+N, N+N);
-    actor.add_layer(N+N, N+N);
-    actor.add_layer(N+N, N+0);
+    Net actor;    
+    actor.add_layer(N,  50);
+    actor.add_layer(50, 50);
+    actor.add_layer(50, 50);
+    actor.add_layer(50,  N);
     actor.use_softmax();
     actor.init(seed);
 
     Net critic;
-    critic.add_layer(N+N, N+0);
-    critic.add_layer(N+0, N+0);
-    critic.add_layer(N+0, N+0);
-    critic.add_layer(N+0, 1);
+    critic.add_layer(N+N, 50);
+    critic.add_layer(50,  50);
+    critic.add_layer(50,  50);
+    critic.add_layer(50,   1);
     critic.init(seed);
 
     DDPG ddpg(actor, critic);
