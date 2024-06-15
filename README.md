@@ -50,7 +50,7 @@ All hyperparameters can be found in ./lib/param.hpp.
 
 The results above show that the model tends to maximize holdings of assets with the best momentum. Furthermore, the model demonstrates arbitrage behavior as its final portfolio value closely reflects the average value of all N assets.
 
-Note that the results above are merely experimental as the model's convergence and behavior may vary by the random seed assigned for simulating an environment. Further work and more complex optimization objectives would be needed for practical applications in real market environments.
+Note that the results above are merely experimental as the model's convergence and behavior may vary by the random seed assigned for simulating an environment. Further hyperparameter testing and more rigorous optimization objectives would be needed for practical applications in real market environments.
 
 ## References
 
