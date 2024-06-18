@@ -76,7 +76,7 @@ void clean() {
 int main(int argc, char *argv[])
 {
     std::cout << std::fixed;
-    std::cout.precision(6);
+    std::cout.precision(12);
 
     param.resize(N);
     for(unsigned int i = 0; i < N; i++)
@@ -85,23 +85,30 @@ int main(int argc, char *argv[])
     path = gbm(param, EXT, seed);
 
     Net actor;    
-    actor.add_layer(N,  50);
-    actor.add_layer(50, 50);
-    actor.add_layer(50, 50);
-    actor.add_layer(50,  N);
+    actor.add_layer(N,   N+N);
+    actor.add_layer(N+N, N+N);
+    actor.add_layer(N+N, N+N);
+    actor.add_layer(N+N, N+N);
+    actor.add_layer(N+N,   N);
     actor.use_softmax();
     actor.init(seed);
 
     Net critic;
-    critic.add_layer(N+N, 50);
-    critic.add_layer(50,  50);
-    critic.add_layer(50,  50);
-    critic.add_layer(50,   1);
+    critic.add_layer(N+N, N+N);
+    critic.add_layer(N+N, N+N);
+    critic.add_layer(N+N, N+N);
+    critic.add_layer(N+N, N+N);
+    critic.add_layer(N+N,   1);
     critic.init(seed);
 
     DDPG ddpg(actor, critic);
 
     double eps = EPS_INIT;
+    double alpha = ALPHA_INIT;
+    double decay = log(ALPHA_MIN) - log(ALPHA_INIT);
+    unsigned int total = ITR*(EXT-OBS)-CAPACITY;
+    unsigned int global_count = 0;
+
     for(unsigned int itr = 0; itr < ITR; itr++) {
         unsigned int update_count = 0;
         double reward_sum = 0.00, q_sum = 0.00;
@@ -126,8 +133,11 @@ int main(int argc, char *argv[])
                 std::shuffle(index.begin(), index.end(), seed);
                 index.erase(index.begin() + BATCH, index.end());
 
+                alpha = ALPHA_INIT * exp(decay * global_count / total);
+                global_count++;
+
                 for(unsigned int &k: index)
-                    q_sum += ddpg.optimize(memory[k], GAMMA, ALPHA, LAMBDA);
+                    q_sum += ddpg.optimize(memory[k], GAMMA, alpha, LAMBDA);
                 update_count += BATCH;
 
                 memory.erase(memory.begin());
