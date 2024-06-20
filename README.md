@@ -38,7 +38,7 @@ $$Q^{*}(s_{t},a_{t})=r_{t}+{\gamma}Q'(s_{t+1},a_{t+1}=\mu'(s_{t+1}))$$
 
 Since the critic network directly maps the state-action space to reward, the action gradient $\frac{dQ}{da}$ must be computed for each action while updating the critic network such that $\nabla{J}=\nabla_{a_{t}}Q(s_{t},a_{t};\theta)\nabla_{\phi}\mu(s_{t})$ can be computed to maximize $J$. Exploration can be done by either adding OU noise or uncorrelated Gaussian noise to the parameters.
 
-Let the state space be $s_{t}=<\delta P_{1}(t), \delta P_{2}(t), ..., \delta P_{n-1}(t)>$ where $\delta P_{i}(t)$ is the percentage change of each asset's price series over some time-step. Given $s_t$, the actor yields the action space $a_{t}$ where each value in $a_{t}$ is the weight allocated to each asset. The reward is calculated as $r_{t}=\log(P_{t+1}{\cdot}a_{t})$.
+Let the state space be $s_{t}=<\delta P_{1}(t), \delta P_{2}(t), ..., \delta P_{n-1}(t)>$ where $\delta P_{i}(t)$ is the change in each asset's logarithmic price over some time-step. Given $s_t$, the actor yields the action space $a_{t}$ where each value in $a_{t}$ is the weight allocated to each asset. The reward is calculated as the difference between the logarithmic portfolio value and that of the mean price of all assets.
 
 ## Parameters
 
@@ -46,7 +46,7 @@ All hyperparameters can be found in ./lib/param.hpp.
 
 ## Results
 
-![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/trial1/result.png)
+![alt text](https://github.com/junyoung-sim/portfolio/blob/main/res/result.png)
 
 The results above show that the model tends to maximize holdings of assets with the best momentum. Furthermore, the model demonstrates arbitrage behavior as its final portfolio value closely reflects the average value of all N assets.
 

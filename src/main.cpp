@@ -23,13 +23,6 @@ std::vector<double> mean_reward;
 std::vector<double> test;
 std::vector<std::vector<double>> test_action;
 
-std::vector<double> sample_state(unsigned int t) {
-    std::vector<double> state(N);
-    for(unsigned int i = 0; i < N; i++)
-        state[i] = (path[i][t] - path[i][t-OBS]) / path[i][t-OBS];
-    return state;
-}
-
 void write() {
     out.open("./res/path");
     for(unsigned int i = 0; i < N; i++)
@@ -55,7 +48,7 @@ void write() {
     out.open("./res/action");
     for(unsigned int i = 0; i < N; i++)
         out << i << (i != N-1 ? "," : "\n");
-    for(unsigned int t = 0; t < EXT-1; t++) {
+    for(unsigned int t = 0; t < EXT-OBS; t++) {
         for(unsigned int i = 0; i < N; i++)
             out << test_action[i][t] << (i != N-1 ? "," : "\n");
     }
@@ -73,6 +66,13 @@ void clean() {
     std::vector<std::vector<double>>().swap(test_action);
 }
 
+std::vector<double> sample_state(unsigned int t) {
+    std::vector<double> state(N);
+    for(unsigned int i = 0; i < N; i++)
+        state[i] = log(path[i][t]) - log(path[i][t-OBS]);
+    return state;
+}
+
 int main(int argc, char *argv[])
 {
     std::cout << std::fixed;
@@ -85,29 +85,25 @@ int main(int argc, char *argv[])
     path = gbm(param, EXT, seed);
 
     Net actor;    
-    actor.add_layer(N,   N+N);
-    actor.add_layer(N+N, N+N);
-    actor.add_layer(N+N, N+N);
-    actor.add_layer(N+N, N+N);
-    actor.add_layer(N+N,   N);
+    actor.add_layer(N,  50);
+    actor.add_layer(50, 50);
+    actor.add_layer(50, 50);
+    actor.add_layer(50, 50);
+    actor.add_layer(50,  N);
     actor.use_softmax();
     actor.init(seed);
 
     Net critic;
-    critic.add_layer(N+N, N+N);
-    critic.add_layer(N+N, N+N);
-    critic.add_layer(N+N, N+N);
-    critic.add_layer(N+N, N+N);
-    critic.add_layer(N+N,   1);
+    critic.add_layer(N+N, 50);
+    critic.add_layer(50,  50);
+    critic.add_layer(50,  50);
+    critic.add_layer(50,  50);
+    critic.add_layer(50,   1);
     critic.init(seed);
 
     DDPG ddpg(actor, critic);
 
     double eps = EPS_INIT;
-    double alpha = ALPHA_INIT;
-    double decay = log(ALPHA_MIN) - log(ALPHA_INIT);
-    unsigned int total = ITR*(EXT-OBS)-CAPACITY;
-    unsigned int global_count = 0;
 
     for(unsigned int itr = 0; itr < ITR; itr++) {
         unsigned int update_count = 0;
@@ -119,10 +115,15 @@ int main(int argc, char *argv[])
             std::vector<double> action = ddpg.epsilon_greedy(state, eps);
             std::vector<double> next_state = sample_state(t+1);
 
-            double reward = 0.00;
-            for(unsigned int i = 0; i < N; i++)
-                reward += path[i][t+1] * action[i];
-            reward = log10(reward);
+            double mean  = 0.00;
+            double model = 0.00;
+            for(unsigned int i = 0; i < N; i++) {
+                mean  += path[i][t+1];
+                model += path[i][t+1] * action[i];
+            }
+            mean /= N;
+
+            double reward = log(model) - log(mean);
             reward_sum += reward;
             
             memory.push_back(Memory(state, action, next_state, reward));
@@ -133,11 +134,8 @@ int main(int argc, char *argv[])
                 std::shuffle(index.begin(), index.end(), seed);
                 index.erase(index.begin() + BATCH, index.end());
 
-                alpha = ALPHA_INIT * exp(decay * global_count / total);
-                global_count++;
-
                 for(unsigned int &k: index)
-                    q_sum += ddpg.optimize(memory[k], GAMMA, alpha, LAMBDA);
+                    q_sum += ddpg.optimize(memory[k], GAMMA, ALPHA, LAMBDA);
                 update_count += BATCH;
 
                 memory.erase(memory.begin());
@@ -145,14 +143,14 @@ int main(int argc, char *argv[])
             }
         }
 
-        mean_reward.push_back(reward_sum / (EXT-1));
+        mean_reward.push_back(reward_sum / (EXT-OBS));
 
         std::cout << "ITR=" << itr << " ";
         std::cout << "MR=" << mean_reward.back() << " ";
         std::cout << "Q=" << q_sum / update_count << "\n";
     }
 
-    test_action.resize(N, std::vector<double>(EXT-1));
+    test_action.resize(N, std::vector<double>(EXT-OBS));
 
     for(unsigned int t = OBS; t < EXT; t++) {
         std::vector<double> state = sample_state(t);
@@ -161,7 +159,7 @@ int main(int argc, char *argv[])
         double reward = 0.00;
         for(unsigned int i = 0; i < N; i++) {
             reward += path[i][t+1] * action[i];
-            test_action[i][t-1] = action[i];
+            test_action[i][t-OBS] = action[i];
         }
         test.push_back(reward);
 
